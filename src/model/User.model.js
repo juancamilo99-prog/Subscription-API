@@ -1,4 +1,5 @@
 const mongoose = require('mongoose'); //importamos mongoose
+const bcrypt = require('bcrypt');
 
 //modelo usuario
 const userSchema = new mongoose.Schema(
@@ -34,6 +35,11 @@ const userSchema = new mongoose.Schema(
         timestamps: true,
     }
 );
+
+userSchema.pre("save", async function(){
+    //this.password contiene la contraseña en el texto plano
+    this.password = await bcrypt.hashSync(this.password, 10) // 10 = nivel del coste
+});
 
 const User = mongoose.model("User", userSchema);
 

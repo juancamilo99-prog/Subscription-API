@@ -30,14 +30,71 @@ const registerUser = async(req, res) => {
 
 const getUser = async(req, res) => {
     try {
-        const user = await User.find();
+        const user = await User.find().populate("subscriptions");
         res.status(200).json(user);
     } catch (error) {
         res.status(400).json ({error: "Error al obtener las peliculas"})
     }
 }
 
+//login usuario
+const login_user = async(req,res) => {
+    try {
+        //buscamos al usuario por su email
+        const user = await User.findOne({email: req.body.email});
+
+        //preguntamos si no existe para devovler el error
+        if(!user){
+            return res.status(400).json("contraseña o usuario incorrectos");
+        }
+
+        const validar_password = bcrypt.compareSync(req.body.password, user.password);
+
+        if(!validar_password){
+            return res.status(400).json("Contraseña no valida")
+        }
+
+        //generamos un token JWT si la contraseña es valida
+        const token = generateToken(user._id, user.email);
+
+        //devolvemos el token
+        console.log("Inicio de sesion exitoso!")
+        return res.status(200).json({token, user});
+    } catch (error) {
+        res.status(400).json({error: "Error al intentar logear usuario"})
+    }
+}
+
+//actualizar roll usuarios
+
+const update_user_rol = async(req, res) => {
+    try {
+        const { id } = req.params
+        const { role } = req.body;
+
+        const user = await User.findById(id);
+
+        if(!user){
+            return res.status(404).json({
+                message: "Usuario no encontrado"
+            });
+        }
+
+        if(role !== undefined) user.role = role;
+
+        await user.save();
+        return res.status(200).json(user)
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "Error al actualizar el rol del usuario"
+        })
+    }
+}
+
 module.exports = {
     registerUser,
-    getUser
+    getUser,
+    update_user_rol,
+    login_user
 }
