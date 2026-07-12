@@ -24,6 +24,24 @@ const isAuth = async(req,res,next) => {
     }
 }
 
+const isAuthDelete = async(req,res,next) => {
+    try {
+        
+        const [, token] = req.headers.authorization.split(" ");
+        const { id } = verifyToken(token);
+        const user = await User.findById(id);
+    
+        user.password = null;
+        req.user = user;
+
+        next();
+    } catch (error) {
+        console.log(error)
+        return res.status(401).json({error: "No estas autorizado"});
+    }
+}
+
 module.exports = {
-    isAuth
+    isAuth,
+    isAuthDelete
 }

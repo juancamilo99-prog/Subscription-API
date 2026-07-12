@@ -92,9 +92,40 @@ const update_user_rol = async(req, res) => {
     }
 }
 
+//eliminar usuario
+const user_delete = async(req, res, next) => {
+    try {
+        const { id } = req.params
+
+        if(req.user.role !== "admin" && req.user._id.toString() !== id){
+            return res.status(500).json({
+                message: "No tienes permisos para eliminar este usuario"
+            })
+        }
+        
+        const userDelete = await User.findByIdAndDelete(id);
+
+        if(!userDelete){
+            return res.status(404).json({
+                message: "Usuario no encontrado"
+            });
+        }
+
+        return res.status(200).json({
+            message: "Usuario eliminado",
+            elemento: userDelete
+        });
+
+        next();
+    } catch (error) {
+        
+    }
+}
+
 module.exports = {
     registerUser,
     getUser,
     update_user_rol,
-    login_user
+    login_user,
+    user_delete
 }
