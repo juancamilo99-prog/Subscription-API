@@ -1,5 +1,23 @@
 const mongoose = require('mongoose');
 
+const imageScheman = new mongoose.Schema(
+    {
+        url: {
+            type: String,
+            required: true
+        },
+        publicId: {
+            type: String,
+            required: true
+        }
+    },
+    {
+        _id: true,
+        timestamps: false
+    }
+);
+
+
 const subscriptionSchema = new mongoose.Schema(
     {
         name:{
@@ -19,18 +37,10 @@ const subscriptionSchema = new mongoose.Schema(
             type: Boolean,
             default: true
         },
-        url: {
-            type: String,
-            required: true
-        },
-        publicId: {
-            type: String,
-            required: true
-        }
+        images: [imageScheman]
     },
     {
-        _id: true,
-        timestamps: false
+        timestamps: true
     }
 )
 
