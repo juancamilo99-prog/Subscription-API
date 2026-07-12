@@ -21,7 +21,7 @@ const storage = new CloudinaryStorage({
         const uniqueFilename = `${Date.now()}-${formatFileName(file.originalname)}`
 
         return {
-            folder: "products",
+            folder: "subscription",
             allowed_formats: ["jpg", "jpeg", "png", "webp"],
             public_id: uniqueFilename
         }

@@ -1,4 +1,4 @@
-const cloudinary = require('cloudinary'); // importamos cloudinary
+const cloudinary = require('cloudinary').v2; // importamos cloudinary
 
 //configuramos cloudinary con las variables de entorno
 cloudinary.config({

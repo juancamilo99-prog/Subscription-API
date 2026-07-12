@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const imageScheman = new mongoose.Schema(
+const imageSchema = new mongoose.Schema(
     {
         url: {
             type: String,
@@ -20,7 +20,7 @@ const imageScheman = new mongoose.Schema(
 
 const subscriptionSchema = new mongoose.Schema(
     {
-        name:{
+        title:{
             type: String,
             required: true
         },
@@ -37,13 +37,13 @@ const subscriptionSchema = new mongoose.Schema(
             type: Boolean,
             default: true
         },
-        images: [imageScheman]
+        images: [imageSchema]
     },
     {
         timestamps: true
     }
 )
 
-const Subscription = mongoose.model("Subscription", suscriptionSchema);
+const Subscription = mongoose.model("Subscription", subscriptionSchema);
 
 module.exports = Subscription;

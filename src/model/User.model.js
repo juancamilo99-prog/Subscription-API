@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema(
         },
         subscriptions: [
             {
-                type: mongoose.Schema.Types.ObjectId, ref: 'Subscriptions'
+                type: mongoose.Schema.Types.ObjectId, ref: 'Subscription'
             }
         ]
     },
