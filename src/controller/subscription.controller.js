@@ -1,6 +1,6 @@
 const Subscriptions = require("../model/Suscription.model");
 const User = require("../model/User.model");
-const { deleteFiles } = require("../middleware/cloudinary/deleteFiles");
+const { deleteFiles, deleteManyImages } = require("../middleware/cloudinary/deleteFiles");
 
 const mapUploadFiles = (files = []) => {
     return files.map((file) => ({
@@ -30,8 +30,24 @@ const create_subscripcion = async(req, res) => {
             });
         }
 
+        const titleLower = title.trim().toLowerCase();
+        
+        const existe_suscripcion = await Subscriptions.findOne({
+            //lo que este dentro de user.subscription  el nombre del titulo
+            _id: { $in: user.subscriptions},
+            title: titleLower,
+        })
+
         //cargamos la imagen
         const upload_images = mapUploadFiles(req.files);
+
+        if(existe_suscripcion){
+            //si existe la suscripcion eliminamos la imagen de cloudinary
+            await deleteManyImages(upload_images);
+            return res.status(400).json({
+                message: "El usuario ya tiene esta suscripcion"
+            })
+        }
 
         //creamos la nueva suscripcion
         const new_subscription = await Subscriptions.create({
