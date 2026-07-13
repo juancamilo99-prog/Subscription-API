@@ -4,7 +4,7 @@ const deleteManyImages = async(images = []) => {
     if(!images.length) return
 
     await Promise.all(
-        images.map((image) => cloudinary.uploader.destroy(image))
+        images.map((image) => cloudinary.uploader.destroy(image.publicId))
     )
 };
 

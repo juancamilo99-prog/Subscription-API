@@ -1,6 +1,8 @@
 const User = require("../model/User.model");
+const Subscriptions = require("../model/Suscription.model");
 const bcrypt = require('bcrypt');
 const { generateToken } = require("../../utils/jwtokens/tokenUser");
+const { deleteManyImages } = require("../middleware/cloudinary/deleteFiles");
 
 //registrar usuarios
 const registerUser = async(req, res) => {
@@ -103,22 +105,51 @@ const user_delete = async(req, res, next) => {
             })
         }
         
-        const userDelete = await User.findByIdAndDelete(id);
 
-        if(!userDelete){
+        //buscamos al usuario
+        const user = await User.findById(id).populate("subscriptions");
+
+        if(!user){
             return res.status(404).json({
                 message: "Usuario no encontrado"
             });
         }
 
+        //buscamos las suscripciones relacionadas con sus ids
+        const subscription = await user.subscriptions.map((subscription) => subscription._id);
+
+        //elminamos la subscripcion
+        await Subscriptions.deleteMany({
+            //operador mongo -> "que este dentro de: subscription"
+            _id: { $in: subscription}
+        })
+        //eliminamos las imagenes de cloudinary
+        for (const subscriptionIMG of user.subscriptions) {
+            await deleteManyImages(subscriptionIMG.images);
+            console.log("imagenes eliminadas")
+        }
+
+        //eliminamos al usuario
+        await User.findByIdAndDelete(id);
+
+        if(!subscription){
+            return res.status(404).json({
+                message: "subscripcion no encontrada"
+            });
+        }
+
         return res.status(200).json({
             message: "Usuario eliminado",
-            elemento: userDelete
+            deleteUser: user,
+            deleteSub: user.subscriptions
         });
 
         next();
     } catch (error) {
-        
+        console.log(error)
+        res.status(400).json({
+            message: "Error en la eliminacion del usuario"
+        })
     }
 }
 
